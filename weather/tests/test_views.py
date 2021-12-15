@@ -29,6 +29,20 @@ class WeatherTestViews(APITestCase):
         self.assertTrue(_is_valid_location(data, 'Bogota, CO'))
         self.assertTrue(_is_valid_temperature_unit(data, unit))
 
+    def test_no_city_is_passed(self):
+        res = self.client.get(f"{WEATHER_URL}")
+        status_code = res.status_code
+        data = res.data
+        self.assertEqual(status_code, 400)
+        self.assertEqual(data, 'city is required')
+
+    def test_wrong_unit_passed(self):
+        res = self.client.get(f"{WEATHER_URL}?city=puebla&units=unknown")
+        status_code = res.status_code
+        data = res.data
+        self.assertEqual(status_code, 400)
+        self.assertEqual(data, "Only 'metric' and 'imperial' are allowed units")
+
     def test_only_city_success(self):
         res = self.client.get(f"{WEATHER_URL}?city=puebla&units=metric")
         status_code = res.status_code
