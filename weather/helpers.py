@@ -3,7 +3,44 @@
 
 def get_wind_direction(wind_degrees):
     """Function to get wind direction based in wind degrees"""
-    pass
+    valid_types = (int, float)
+    if type(wind_degrees) not in valid_types:
+        return 'Must provide a valid wind degrees'
+
+    if wind_degrees >= 337.50:
+        direction = 'north-northwest'
+    elif wind_degrees >= 315:
+        direction = 'northwest'
+    elif wind_degrees >= 292.50:
+        direction = 'west-northwest'
+    elif wind_degrees >= 270:
+        direction = 'west'
+    elif wind_degrees >= 247.50:
+        direction = 'west-southwest'
+    elif wind_degrees >= 225:
+        direction = 'southwest'
+    elif wind_degrees >= 202.50:
+        direction = 'south-southwest'
+    elif wind_degrees >= 180:
+        direction = 'south'
+    elif wind_degrees >= 157.50:
+        direction = 'south-southeast'
+    elif wind_degrees >= 135:
+        direction = 'southeast'
+    elif wind_degrees >= 112.50:
+        direction = 'east-southeast'
+    elif wind_degrees >= 90:
+        direction = 'east'
+    elif wind_degrees >= 67.50:
+        direction = 'east-northeast'
+    elif wind_degrees >= 45:
+        direction = 'northeast'
+    elif wind_degrees >= 22.50:
+        direction = 'north-northeast'
+    else:
+        direction = 'north'
+
+    return direction
 
 
 def get_wind_description(wind_speed, wind_degrees, units):
