@@ -16,7 +16,7 @@ class WeatherTestHelpers(TestCase):
         self.assertEqual(get_wind_direction(48.6), 'northeast')
         self.assertEqual(get_wind_direction(5.6), 'north')
 
-    def test_get_wind_description(self):
+    def test_get_wind_full_description(self):
         self.assertEqual(
             get_wind_full_description('something', 'wrong', 'metric'),
             'Must provide valid wind speed and degrees'
