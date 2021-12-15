@@ -171,7 +171,11 @@ def get_wind_full_description(wind_speed, wind_degrees, units):
     if units not in valid_units:
         return 'Invalid units'
 
-    return ''
+    wind_speed_unit = 'm/s' if units == 'metric' else 'm/h'
+    wind_direction = get_wind_direction(wind_degrees)
+    wind_description = get_wind_description(wind_speed, units)
+
+    return f"{wind_description}, {wind_speed} {wind_speed_unit}, {wind_direction}"
 
 
 def get_cloudiness_description(cloud_percentage):
