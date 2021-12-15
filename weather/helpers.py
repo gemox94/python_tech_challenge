@@ -1,6 +1,101 @@
 """Helper functions related to weather app"""
 
 
+WIND_RANGES = [
+    {
+        'imperial_min': 0,
+        'imperial_max': 1,
+        'metric_min': 0,
+        'metric_max': 0.2,
+        'label': 'Calm'
+    },
+    {
+        'imperial_min': 1,
+        'imperial_max': 4,
+        'metric_min': 0.2,
+        'metric_max': 1.5,
+        'label': 'Light air'
+    },
+    {
+        'imperial_min': 4,
+        'imperial_max': 8,
+        'metric_min': 1.5,
+        'metric_max': 3.3,
+        'label': 'Light breeze'
+    },
+    {
+        'imperial_min': 8,
+        'imperial_max': 13,
+        'metric_min': 3.4,
+        'metric_max': 5.4,
+        'label': 'Gentle breeze'
+    },
+    {
+        'imperial_min': 13,
+        'imperial_max': 19,
+        'metric_min': 5.4,
+        'metric_max': 7.9,
+        'label': 'Moderate breeze'
+    },
+    {
+        'imperial_min': 19,
+        'imperial_max': 25,
+        'metric_min': 7.9,
+        'metric_max': 10.7,
+        'label': 'Fresh breeze'
+    },
+    {
+        'imperial_min': 25,
+        'imperial_max': 32,
+        'metric_min': 10.7,
+        'metric_max': 13.8,
+        'label': 'Strong breeze'
+    },
+    {
+        'imperial_min': 32,
+        'imperial_max': 39,
+        'metric_min': 13.8,
+        'metric_max': 17.1,
+        'label': 'Near gale'
+    },
+    {
+        'imperial_min': 39,
+        'imperial_max': 47,
+        'metric_min': 17.1,
+        'metric_max': 20.7,
+        'label': 'Gale'
+    },
+    {
+        'imperial_min': 47,
+        'imperial_max': 55,
+        'metric_min': 20.7,
+        'metric_max': 24.4,
+        'label': 'Strong gale'
+    },
+    {
+        'imperial_min': 55,
+        'imperial_max': 64,
+        'metric_min': 24.4,
+        'metric_max': 28.4,
+        'label': 'Whole gale'
+    },
+    {
+        'imperial_min': 64,
+        'imperial_max': 75,
+        'metric_min': 28.4,
+        'metric_max': 32.6,
+        'label': 'Storm force'
+    },
+    {
+        'imperial_min': 75,
+        'imperial_max': 1000,
+        'metric_min': 32.6,
+        'metric_max': 1000,
+        'label': 'Hurricane force'
+    },
+]
+
+
 def get_wind_direction(wind_degrees):
     """Function to get wind direction based in wind degrees"""
     valid_types = (int, float)
@@ -41,6 +136,28 @@ def get_wind_direction(wind_degrees):
         direction = 'north'
 
     return direction
+
+
+def get_wind_description(wind_speed, units):
+
+    valid_types = (int, float)
+    if type(wind_speed) not in valid_types:
+        return 'Must provide a valid wind speed'
+
+    valid_units = ('metric', 'imperial')
+    if units not in valid_units:
+        return 'Must provide a valid unit'
+
+    min_field = 'metric_min' if units == 'metric' else 'imperial_min'
+    max_field = 'metric_max' if units == 'metric' else 'imperial_max'
+    wind_label = next(
+        (w_range['label'] for w_range in WIND_RANGES if w_range[min_field] <= wind_speed < w_range[max_field]), None
+    )
+
+    if not wind_label:
+        return 'Wind speed description not found'
+
+    return wind_label
 
 
 def get_wind_full_description(wind_speed, wind_degrees, units):
