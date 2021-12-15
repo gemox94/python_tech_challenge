@@ -43,7 +43,7 @@ def get_wind_direction(wind_degrees):
     return direction
 
 
-def get_wind_description(wind_speed, wind_degrees, units):
+def get_wind_full_description(wind_speed, wind_degrees, units):
     """Function to get readable wind information"""
 
     valid_types = (int, float)
