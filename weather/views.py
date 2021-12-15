@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -38,6 +38,11 @@ def get_weather(request):
     degree_unit = f"°{'C' if units == 'metric' else 'F'}"
     weather_data = res_weather.json()
 
+    # Set up sunrise/sunset based in given timezone
+    t_zone = timezone(timedelta(seconds=weather_data['timezone']))
+    sunrise_datetime = datetime.fromtimestamp(weather_data['sys']['sunrise'], tz=t_zone)
+    sunset_datetime = datetime.fromtimestamp(weather_data['sys']['sunset'], tz=t_zone)
+
     wind_speed = weather_data['wind']['speed']
     wind_degrees = weather_data['wind']['deg']
     payload = {
@@ -47,9 +52,8 @@ def get_weather(request):
         "cloudiness": get_cloudiness_description(weather_data['clouds']['all']),
         "pressure": f"{weather_data['main']['pressure']} hPa",
         "humidity": f"{weather_data['main']['humidity']}%",
-        # TODO: Should calculate sunrise-sunset time using timezone offset
-        "sunrise": weather_data['sys']['sunrise'],
-        "sunset": weather_data['sys']['sunset'],
+        "sunrise": sunrise_datetime.strftime('%H:%M'),
+        "sunset": sunset_datetime.strftime('%H:%M'),
         "geo_coordinates": f"[{weather_data['coord']['lat']},{weather_data['coord']['lon']}]",
         "requested_time": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         # TODO: Should retrieve forecasts
