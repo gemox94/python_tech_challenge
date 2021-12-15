@@ -1,6 +1,11 @@
 """Helper functions related to weather app"""
 
 
+def get_wind_direction(wind_degrees):
+    """Function to get wind direction based in wind degrees"""
+    pass
+
+
 def get_wind_description(wind_speed, wind_degrees, units):
     """Function to get readable wind information"""
 
