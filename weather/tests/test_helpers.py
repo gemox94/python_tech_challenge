@@ -24,6 +24,8 @@ class WeatherTestHelpers(TestCase):
         self.assertEqual(get_wind_description(.5, 'metric'), 'Light air')
         self.assertEqual(get_wind_description(13, 'imperial'), 'Moderate breeze')
         self.assertEqual(get_wind_description(31.5, 'imperial'), 'Strong breeze')
+        self.assertEqual(get_wind_description(1001, 'imperial'), 'Wind speed description not found')
+        self.assertEqual(get_wind_description(1001, 'metric'), 'Wind speed description not found')
 
     def test_get_wind_full_description(self):
         self.assertEqual(
