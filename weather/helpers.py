@@ -189,3 +189,7 @@ def get_cloudiness_description(cloud_percentage):
         desc = 'Overcast'
 
     return desc
+
+
+def get_city_forecasts(city, units, country=None):
+    pass
