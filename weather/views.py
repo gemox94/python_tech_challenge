@@ -5,6 +5,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from weather.helpers import get_wind_full_description, get_cloudiness_description
+
 
 @api_view(['GET'])
 def get_weather(request):
@@ -35,12 +37,14 @@ def get_weather(request):
     # TODO: Retrieve and include forecasts
     degree_unit = f"°{'C' if units == 'metric' else 'F'}"
     weather_data = res_weather.json()
+
+    wind_speed = weather_data['wind']['speed']
+    wind_degrees = weather_data['wind']['deg']
     payload = {
         "location_name": f"{weather_data['name']}, {weather_data['sys']['country']}",
         "temperature": f"{weather_data['main']['temp']} {degree_unit}",
-        # TODO: Should create functions to get readable wind and cloudiness
-        "wind": "",
-        "cloudiness": "",
+        "wind": get_wind_full_description(wind_speed, wind_degrees, units),
+        "cloudiness": get_cloudiness_description(weather_data['clouds']['all']),
         "pressure": f"{weather_data['main']['pressure']} hPa",
         "humidity": f"{weather_data['main']['humidity']}%",
         # TODO: Should calculate sunrise-sunset time using timezone offset
