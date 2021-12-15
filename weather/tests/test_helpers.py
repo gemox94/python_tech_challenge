@@ -45,7 +45,7 @@ class WeatherTestHelpers(TestCase):
 
         self.assertEqual(
             get_wind_full_description(10.8, 300.00, 'imperial'),
-            'Gentle breeze, 3.6 m/h, west-northwest'
+            'Gentle breeze, 10.8 m/h, west-northwest'
         )
 
     def test_get_cloudiness_description(self):
