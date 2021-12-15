@@ -22,7 +22,7 @@ def _is_valid_temperature_unit(weather, unit):
 class WeatherTestViews(APITestCase):
 
     def __test_temperature_unit(self, unit):
-        res = self.client.get(WEATHER_URL, params={'q': 'bogota,co', 'units': unit})
+        res = self.client.get(f"{WEATHER_URL}?city=bogota&country=co&units={unit}")
         status_code = res.status_code
         data = res.data
         self.assertEqual(status_code, 200)
@@ -30,24 +30,24 @@ class WeatherTestViews(APITestCase):
         self.assertTrue(_is_valid_temperature_unit(data, unit))
 
     def test_only_city_success(self):
-        res = self.client.get(WEATHER_URL, params={'q': 'playa del carmen', 'units': 'metric'})
+        res = self.client.get(f"{WEATHER_URL}?city=puebla&units=metric")
         status_code = res.status_code
         data = res.data
         self.assertEqual(status_code, 200)
-        self.assertTrue(_is_valid_location(data, 'Playa Del Carmen, MX'))
+        self.assertTrue(_is_valid_location(data, 'Puebla, MX'))
 
     def test_city_and_state_success(self):
-        res = self.client.get(WEATHER_URL, params={'q': 'bogota,co', 'units': 'metric'})
+        res = self.client.get(f"{WEATHER_URL}?city=bogota&country=co&units=metric")
         status_code = res.status_code
         data = res.data
         self.assertEqual(status_code, 200)
         self.assertTrue(_is_valid_location(data, 'Bogota, CO'))
 
     def test_invalid_city_fails(self):
-        res = self.client.get(WEATHER_URL, params={'q': 'unknown city', 'units': 'metric'})
+        res = self.client.get(f"{WEATHER_URL}?city=unknown&units=metric")
         status_code = res.status_code
         data = res.data
-        self.assertEqual(status_code, 400)
+        self.assertEqual(status_code, 404)
         self.assertEqual(data, 'Location not found')
 
     def test_imperial_units(self):
