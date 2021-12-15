@@ -1,6 +1,8 @@
 from django.test import TestCase
 
-from weather.helpers import get_wind_direction, get_wind_full_description, get_cloudiness_description
+from weather.helpers import (
+    get_wind_direction, get_wind_description, get_wind_full_description, get_cloudiness_description
+)
 
 
 class WeatherTestHelpers(TestCase):
@@ -15,6 +17,13 @@ class WeatherTestHelpers(TestCase):
         self.assertEqual(get_wind_direction(90), 'east')
         self.assertEqual(get_wind_direction(48.6), 'northeast')
         self.assertEqual(get_wind_direction(5.6), 'north')
+
+    def test_get_wind_description(self):
+        self.assertEqual(get_wind_description('something', 'metric'), 'Must provide a valid wind speed')
+        self.assertEqual(get_wind_description(.5, 'unknown'), 'Must provide a valid unit')
+        self.assertEqual(get_wind_description(.5, 'metric'), 'Calm')
+        self.assertEqual(get_wind_description(13, 'imperial'), 'Moderate breeze')
+        self.assertEqual(get_wind_description(31.5, 'imperial'), 'Strong breeze')
 
     def test_get_wind_full_description(self):
         self.assertEqual(
