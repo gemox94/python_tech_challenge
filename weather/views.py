@@ -1,7 +1,55 @@
+import requests
+from datetime import datetime
+from django.conf import settings
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
 @api_view(['GET'])
 def get_weather(request):
-    return Response({'status': 'ok'})
+
+    city = request.query_params.get('city', None)
+    country = request.query_params.get('country', None)
+    units = request.query_params.get('units', 'metric')
+
+    if not city:
+        return Response('city is required', status=status.HTTP_400_BAD_REQUEST)
+
+    allowed_units = ('metric', 'imperial')
+    if units not in allowed_units:
+        return Response("Only 'metric' and 'imperial' are allowed units", status=status.HTTP_400_BAD_REQUEST)
+
+    if country:
+        city += f',{country.lower()}'
+
+    # Get weather data from API
+    url = f'{settings.WEATHER_API_URL}/weather'
+    params = {'q': city, 'units': units, 'appid': settings.WEATHER_API_KEY}
+    res_weather = requests.get(url, params=params)
+    status_code = res_weather.status_code
+
+    if status_code == 404:
+        return Response('Location not found', status=status.HTTP_404_NOT_FOUND)
+
+    # TODO: Retrieve and include forecasts
+    degree_unit = f"°{'C' if units == 'metric' else 'F'}"
+    weather_data = res_weather.json()
+    payload = {
+        "location_name": f"{weather_data['name']}, {weather_data['sys']['country']}",
+        "temperature": f"{weather_data['main']['temp']} {degree_unit}",
+        # TODO: Should create functions to get readable wind and cloudiness
+        "wind": "",
+        "cloudiness": "",
+        "pressure": f"{weather_data['main']['pressure']} hPa",
+        "humidity": f"{weather_data['main']['humidity']}%",
+        # TODO: Should calculate sunrise-sunset time using timezone offset
+        "sunrise": weather_data['sys']['sunrise'],
+        "sunset": weather_data['sys']['sunset'],
+        "geo_coordinates": f"[{weather_data['coord']['lat']},{weather_data['coord']['lon']}]",
+        "requested_time": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        # TODO: Should retrieve forecasts
+        # "forecast": []
+    }
+
+    return Response(payload, status=status_code)
