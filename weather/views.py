@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from weather.helpers import get_wind_full_description, get_cloudiness_description
+from weather.helpers import get_wind_full_description, get_cloudiness_description, get_city_forecasts
 
 
 @api_view(['GET'])
@@ -34,7 +34,6 @@ def get_weather(request):
     if status_code == 404:
         return Response('Location not found', status=status.HTTP_404_NOT_FOUND)
 
-    # TODO: Retrieve and include forecasts
     degree_unit = f"°{'C' if units == 'metric' else 'F'}"
     weather_data = res_weather.json()
 
@@ -55,9 +54,8 @@ def get_weather(request):
         "sunrise": sunrise_datetime.strftime('%H:%M'),
         "sunset": sunset_datetime.strftime('%H:%M'),
         "geo_coordinates": f"[{weather_data['coord']['lat']},{weather_data['coord']['lon']}]",
-        "requested_time": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        # TODO: Should retrieve forecasts
-        # "forecast": []
+        "requested_time": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+        "forecast": get_city_forecasts(city, units, country=country)
     }
 
     return Response(payload, status=status_code)
