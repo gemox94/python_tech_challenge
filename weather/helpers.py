@@ -1,5 +1,8 @@
 """Helper functions related to weather app"""
 
+import requests
+from datetime import datetime, timezone, timedelta
+from django.conf import settings
 
 WIND_RANGES = [
     {
@@ -94,6 +97,11 @@ WIND_RANGES = [
         'label': 'Hurricane force'
     },
 ]
+
+
+def get_datetime_from_city_timestamp(datetime_milliseconds, timezone_seconds):
+    t_zone = timezone(timedelta(seconds=timezone_seconds))
+    return datetime.fromtimestamp(datetime_milliseconds, tz=t_zone)
 
 
 def get_wind_direction(wind_degrees):
@@ -192,4 +200,34 @@ def get_cloudiness_description(cloud_percentage):
 
 
 def get_city_forecasts(city, units, country=None):
-    pass
+
+    valid_units = ('metric', 'imperial')
+    if units not in valid_units:
+        return 'Invalid units'
+
+    url = f'{settings.WEATHER_API_URL}/forecast'
+    q = f'{city},{country}' if country else city
+    params = {'q': q, 'units': units, 'appid': settings.WEATHER_API_KEY}
+    res = requests.get(url, params=params)
+
+    if res.status_code != 200:
+        return []
+
+    forecasts_data = res.json()
+    forecasts_list = forecasts_data['list']
+    tz_seconds = forecasts_data['city']['timezone']
+    degrees_unit = f"°{'C' if units == 'metric' else 'F'}"
+
+    return [
+        {
+            'date': get_datetime_from_city_timestamp(forecast['dt'], tz_seconds).strftime('%Y-%m-%d'),
+            'time': get_datetime_from_city_timestamp(forecast['dt'], tz_seconds).strftime('%H:%M'),
+            'temperature': f"{forecast['main']['temp']} {degrees_unit}",
+            'feels_like': f"{forecast['main']['feels_like']} {degrees_unit}",
+            'min_temperature': f"{forecast['main']['temp_min']} {degrees_unit}",
+            'max_temperature': f"{forecast['main']['temp_max']} {degrees_unit}",
+            'pressure': f"{forecast['main']['pressure']} hPa",
+            'humidity': f"{forecast['main']['humidity']}%",
+        } for forecast in forecasts_list
+    ]
+
